@@ -7,6 +7,7 @@ class CreateVisits < ActiveRecord::Migration[5.2]
       t.timestamps
     end
     
-    add_index :user_id, :shortened_url_id
+    add_index :visits, :user_id
+    add_index :visits, :shortened_url_id
   end
 end
