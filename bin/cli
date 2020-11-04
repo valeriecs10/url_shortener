@@ -1,0 +1,96 @@
+#!/usr/bin/env ruby
+
+
+def find_user_by_email
+  begin
+    puts "Please enter your email: "
+    user_email = gets.chomp
+    user = User.find_by(email: user_email)
+    raise ArgumentError, "User not in database. Try again." unless user
+    user
+  rescue ArgumentError => e
+    puts e
+    retry
+  end
+end
+
+def create_or_visit
+  begin
+    puts "Enter 1 to visit a shortened URL, or 2 to create one: "
+    user_choice = gets.chomp.to_i
+    raise ArgumentError, "Answer must be either 1 or 2" unless [1, 2].include?(user_choice)
+    user_choice
+  rescue ArgumentError => e
+    puts e
+    retry
+  end
+end
+
+def visit(user)
+  begin
+    puts "Enter the shortened URL: "
+    shortenedUrl = gets.chomp
+    url_object = ShortenedUrl.find_by('short_url = ?', shortenedUrl)
+    raise ArgumentError, "Url not in the database." unless url_object
+    Launchy.open(url_object['long_url'])
+    Visit.record_visit!(user.id, url_object.id)
+  rescue ArgumentError => e
+    puts e
+    retry
+  end
+end
+
+def create(user)
+    puts "Enter the long URL: "
+    long_url = gets.chomp
+    shortened_url = ShortenedUrl.create_for_user_and_long_url(user, long_url)
+    puts "Short url is: #{shortened_url['short_url']}"
+end
+
+def validate_input(prompt)
+  begin
+    return_val = method(prompt).call
+  rescue
+    retry
+  end
+
+  return_val
+end
+
+def another_action?
+  begin
+    puts "Would you like to create or visit another URL? 1 for yes, 2 for no: "
+    user_input = gets.chomp.to_i
+    raise ArgumentError, "Answer must be either 1 or 2" unless [1, 2].include?(user_input)
+    user_input == 1 ? true : false
+  rescue ArgumentError => e
+    puts e
+    retry
+  end
+end
+
+def switch_users?
+  begin
+    puts "Would you like to switch users? 1 for yes, 2 for no: "
+    user_input = gets.chomp.to_i
+    raise ArgumentError, "Answer must be either 1 or 2" unless [1, 2].include?(user_input)
+    user_input == 1 ? true : false
+  rescue ArgumentError => e
+    puts e
+    retry
+  end
+end
+  
+active = true
+lookup_user = true
+
+while active
+  user = find_user_by_email if lookup_user == true
+  user_choice = create_or_visit
+  user_choice == 1 ? visit(user) : create(user)
+  active = false unless another_action?
+  lookup_user = false unless active && switch_users?
+end
+
+    
+
