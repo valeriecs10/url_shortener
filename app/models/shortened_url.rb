@@ -1,14 +1,22 @@
 class ShortenedUrl < ApplicationRecord
   validates :short_url, :long_url, :user_id, presence: true
   validates :short_url, uniqueness: true
-  validate :no_spamming
+  validate :no_spamming, :nonpremium_max
 
   def no_spamming
     recent_urls = User.find_by_id(user_id)
       .submitted_urls
       .where('created_at >= ?', 1.minute.ago)
     if recent_urls.count > 5
-      errors.add("Users cannot create more than 5 shortened URLs per minute")
+      errors.add(:user, "cannot create more than 5 shortened URLs per minute")
+    end
+  end
+
+  def nonpremium_max
+    user = User.find_by_id(user_id)
+    submitted_urls = user.submitted_urls
+    if submitted_urls.count >= 5 && user.premium == false
+      errors.add(:user, "is not premium, cannot create more than 5 shortened URLs")
     end
   end
 
