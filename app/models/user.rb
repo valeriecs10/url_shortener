@@ -1,6 +1,5 @@
 class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
-  validates :premium, presence: true
 
   has_many :submitted_urls,
     class_name: :ShortenedUrl,
