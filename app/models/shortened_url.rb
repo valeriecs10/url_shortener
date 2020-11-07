@@ -44,7 +44,7 @@ class ShortenedUrl < ApplicationRecord
     through: :taggings,
     source: :topic
 
-  def self.create_for_user_and_long_url(user, long_url)
+  def self.create_for_user_and_long_url!(user, long_url)
     raise 'User must be in database' unless User.exists?(:id => user.id)
     raise 'Long url must be a string' unless long_url.is_a?(String)
     short_url = self.random_code
