@@ -28,7 +28,8 @@ class ShortenedUrl < ApplicationRecord
   has_many :visits,
     class_name: :Visit,
     foreign_key: :shortened_url_id,
-    primary_key: :id
+    primary_key: :id,
+    dependent: :destroy
 
   has_many :visitors,
     -> { distinct }, 
@@ -38,7 +39,8 @@ class ShortenedUrl < ApplicationRecord
   has_many :taggings,
     class_name: :Tagging,
     foreign_key: :shortened_url_id,
-    primary_key: :id
+    primary_key: :id,
+    dependent: :destroy
 
   has_many :topics,
     through: :taggings,
