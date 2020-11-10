@@ -16,4 +16,10 @@ class User < ApplicationRecord
     through: :visits, 
     source: :visited_url
 
+  has_many :votes,
+    class_name: :Vote,
+    foreign_key: :user_id,
+    primary_key: :id,
+    dependent: :destroy
+
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_06_204407) do
+ActiveRecord::Schema.define(version: 2020_11_10_015222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,6 +53,15 @@ ActiveRecord::Schema.define(version: 2020_11_06_204407) do
     t.datetime "updated_at", null: false
     t.index ["shortened_url_id"], name: "index_visits_on_shortened_url_id"
     t.index ["user_id"], name: "index_visits_on_user_id"
+  end
+
+  create_table "votes", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "shortened_url_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shortened_url_id"], name: "index_votes_on_shortened_url_id"
+    t.index ["user_id"], name: "index_votes_on_user_id"
   end
 
 end
