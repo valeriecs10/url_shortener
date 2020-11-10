@@ -62,6 +62,22 @@ class ShortenedUrl < ApplicationRecord
     code
   end
 
+  def self.prune(n)
+    stale_urls = all
+      .joins(:submitter)
+      .left_outer_joins(:visits)
+      .where('(shortened_urls.id IN (
+        SELECT shortened_urls.id
+        FROM shortened_urls
+        JOIN visits ON visits.shortened_url_id = shortened_urls.id
+        GROUP BY shortened_urls.id
+        HAVING MAX(visits.created_at) < ?
+      ) OR (
+        visits.id IS NULL AND shortened_urls.created_at < ?
+      )) AND users.premium = \'false\'', n.minutes.ago, n.minutes.ago)
+      .destroy_all
+  end
+
   def num_clicks
     visits.count
   end 
