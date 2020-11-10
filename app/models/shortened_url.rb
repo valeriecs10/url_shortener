@@ -86,6 +86,13 @@ class ShortenedUrl < ApplicationRecord
       .destroy_all
   end
 
+  def self.top 
+    ShortenedUrl
+      .left_outer_joins(:votes)
+      .group(:id)
+      .order('COUNT(votes.shortened_url_id) DESC')
+  end
+
   def num_clicks
     visits.count
   end 
